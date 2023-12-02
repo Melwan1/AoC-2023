@@ -20,6 +20,18 @@ int compare_box(struct box_restriction *box, struct box_output *output)
     return 1;
 }
 
+int compare_game(struct box_restriction *box, struct game *game)
+{
+    for (int index = 0; index < game->output_number; index++)
+    {
+        if (!compare_box(box, game->outputs[index]))
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 void parse_output(FILE *file, struct game *game)
 {
     game->outputs = realloc(game->outputs, (1 + game->output_number) * sizeof(*(game->outputs)));
