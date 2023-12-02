@@ -1,5 +1,7 @@
 #include "game.h"
 
+#include <stdio.h>
+
 int compare_box(struct box_restriction *box, struct box_output *output)
 {
     if (box->max_red < output->red_cubes)
