@@ -82,5 +82,13 @@ int main(void)
         return 1;
     }
     struct box_restriction box = { .max_red = 12; .max_blue = 14; .max_green = 13 };
+    unsigned int sum = 0;
+    struct game *game = parse_game(file);
+    while (game)
+    {
+        sum += compare_game(game, &box);
+        game = parse_game(file);
+    }
+    printf("%d\n", sum);
     fclose(file);
 }
