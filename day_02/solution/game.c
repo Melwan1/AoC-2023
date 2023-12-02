@@ -1,5 +1,6 @@
 #include "game.h"
 
+#include <stddef.h>
 #include <stdio.h>
 
 int compare_box(struct box_restriction *box, struct box_output *output)
@@ -65,8 +66,12 @@ struct game *parse_game(FILE *file)
     struct game *game = malloc(sizeof(struct game));
     if (!fscanf(file, "Game %d: ", &game->id)) // file is at the end
     {
-        return game;
+        return NULL;
     }
+    game->output_number = 0;
+    game->outputs = NULL;
+    parse_output(file, game, game->id);
+    return game;
 }
 
 int main(void)
