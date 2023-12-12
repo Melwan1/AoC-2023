@@ -1,6 +1,7 @@
 #include <err.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <fnmatch.h>
 
 struct box
 {
@@ -17,7 +18,7 @@ void next_item(char **buffer)
     }
     if (**buffer == ',')
     {
-        (*buffer)++;
+        *buffer += 2;
     }
 }
 
@@ -25,24 +26,39 @@ int read_result(char *buffer, struct box *reference)
 {
     // returns 1 if the game is valid, 0 if the string has ended and -1 if the game is invalid
 
-    if (!(*buffer[0]))
+    if (!(*buffer))
     {
         return 0;
     }
     struct box result_box = { .red = 0, .blue = 0, .green = 0};
-    if (sscanf(buffer, "%d red", &(result_box.red)))
+    for (int index = 0; index < 3; index++)
     {
-        next_item(&buffer);
-    }
+        int quantity = 0;
+        if (sscanf(buffer, "%d", &quantity))
+        {
+            while (*buffer != ' ')
+            {
+                buffer++;
+            }
+            buffer++;
+        }
+        if (!fnmatch("red*", buffer, 0))
+        {
+            result_box.red = quantity;
+            next_item(&buffer);
+        }
 
-    if (sscanf(buffer, "%d blue", &(result_box.blue)))
-    {
-        next_item(&buffer);
-    }
+        else if (!fnmatch("blue*", buffer, 0))
+        {
+            result_box.blue = quantity;
+            next_item(&buffer);
+        }
 
-    if (sscanf(buffer, "%d green", &(result_box.green)))
-    {
-        next_item(&buffer);
+        else if (!fnmatch("green*", buffer, 0))
+        {
+            result_box.green = quantity;
+            next_item(&buffer);
+        }
     }
     if (result_box.red > reference->red)
     {
@@ -69,6 +85,7 @@ int read_game(char *buffer, struct box *reference)
     {
         buffer++;
     }
+    buffer += 2;
     int result = read_result(buffer, reference);
     while (result == 1)
     {
@@ -78,7 +95,7 @@ int read_game(char *buffer, struct box *reference)
         }
         if (*buffer == ';')
         {
-            buffer++;
+            buffer += 2;
         }
         result = read_result(buffer, reference);
     }
@@ -98,7 +115,7 @@ int main(void)
     }
     char buffer[256];
     int result = 0;
-    struct box reference = { .red = 12, .blue = 13, .green = 14 };
+    struct box reference = { .red = 12, .green = 13, .blue = 14 };
     while (fgets(buffer, 256, file))
     {
         result += read_game(buffer, &reference);
