@@ -79,7 +79,7 @@ int read_game(char *buffer)
     }
     buffer += 2;
     struct box reference = { 0, 0, 0};
-    result = read_result(buffer, &reference);
+    int result = read_result(buffer, &reference);
     while (result == 1)
     {
         while (*buffer && *buffer != ';')
